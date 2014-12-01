@@ -2,19 +2,10 @@ import sys
 sys.path.append('contrib')
 
 import socket
-from hashlib import sha1
-from random import randint
 from table import Table
-
-
-def entropy(length):
-    return ''.join(chr(randint(0, 255)) for _ in xrange(length))
-
-
-def random_id():
-    hash = sha1()
-    hash.update(entropy(40))
-    return hash.digest()
+from random import randint
+from utils import random_id
+from protocol import Protocol
 
 
 class Node:
@@ -26,7 +17,8 @@ class Node:
         self.ufd.bind((self.bind_ip, self.bind_port))
 
         self.nid = nid if nid is not None else random_id()
-        self.nodes = Table(self.nid)
+        self.table = Table(self.nid)
+        self.protocol = Protocol(self)
 
     def send(self, message, address):
         try:
@@ -36,3 +28,15 @@ class Node:
 
     def recv(self):
         return self.ufd.recvfrom(65536)
+
+    def serve(self):
+        while True:
+            (message, address) = self.recv()
+            self.protocol.handle_request(message, address)
+
+
+if __name__ == "__main__":
+    bootstrap_nodes = [("ts", 6881), ("192.168.1.100", 6881)]
+    node = Node(port=6881)
+    node.protocol.bootstrap(bootstrap_nodes)
+    node.serve()
