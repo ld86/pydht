@@ -33,14 +33,18 @@ class Protocol:
             getattr(self, 'handle_' + request['q'])(request, address)
 
     def handle_find_node(self, request, address):
-        if request['a']['id'] == self.node.nid:
+        mid = self.node.nid         # my id
+        hid = request['a']['id']    # his id
+
+        if hid == mid:
             self.log("drop find_node request from myself")
             return
-        self.node.table.add(request['a']['id'])
+
+        self.node.table.add(hid)
         msg = dict(
             y='r',
             q='find_node',
-            a=dict(nodes=self.node.table.get()))
+            a=dict(nodes=self.node.table.get(hid)))
         self.send(msg, address)
 
     def send_find_node(self, address, nid):
