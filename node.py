@@ -11,10 +11,10 @@ from protocol import Protocol
 class Node:
 
     def __init__(self, ip=None, port=None, nid=None):
-        self.bind_ip = ip if ip is not None else "0.0.0.0"
-        self.bind_port = port if port is not None else randint(40000, 50000)
+        address = (ip if ip is not None else "0.0.0.0", port if port is not None else randint(40000, 50000))
+        self.address = address
         self.ufd = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        self.ufd.bind((self.bind_ip, self.bind_port))
+        self.ufd.bind(self.address)
 
         self.nid = nid if nid is not None else random_id()
         self.table = Table(self.nid)
