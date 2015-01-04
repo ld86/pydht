@@ -1,33 +1,19 @@
-import logging
-import sys
 from bencode import bencode, bdecode
+from logger import log
 
 encode = bencode
 decode = bdecode
-
-
-def logger(name):
-    root = logging.getLogger(name)
-    root.setLevel(logging.DEBUG)
-
-    ch = logging.StreamHandler(sys.stdout)
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    ch.setFormatter(formatter)
-    root.addHandler(ch)
-    return root
 
 
 class Protocol:
 
     def __init__(self, node):
         self.node = node
-        self.log = logger(self.__class__.__name__).info
 
     def handle_request(self, request, address):
         request = decode(request)
 
-        self.log("got request {0}".format(request))
+        log("got request {0}".format(request))
 
         if request['y'] == 'q' and request['q'] in ['find_node']:
             getattr(self, 'handle_' + request['q'])(request, address)
@@ -37,7 +23,7 @@ class Protocol:
         hid = request['a']['id']    # his id
 
         if hid == mid:
-            self.log("drop find_node request from myself")
+            log("drop find_node request from myself")
             return
 
         self.node.table.add(hid)
