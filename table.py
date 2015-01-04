@@ -1,9 +1,15 @@
+class NodePinger:
+
+    def __init__(self, table):
+        pass
+
+
 class Table:
 
-    def __init__(self, nid):
-        self.nid = nid
+    def __init__(self, node):
+        self.nid = node.nid
         self.nodes = set()
-        self.add(nid)
+        self.add(self.nid)
 
     def add(self, nid):
         self.nodes.add(nid)
