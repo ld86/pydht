@@ -2,7 +2,7 @@ import sys
 sys.path.append('contrib')
 
 import socket
-from table import Table
+from table import Table, NodePinger
 from random import randint
 from utils import random_id
 from protocol import Protocol
@@ -17,7 +17,8 @@ class Node:
         self.ufd.bind(self.address)
 
         self.nid = nid if nid is not None else random_id()
-        self.table = Table(self.nid)
+        self.table = Table(self)
+        self.pinger = NodePinger(self.table)
         self.protocol = Protocol(self)
 
     def send(self, message, address):
@@ -29,10 +30,13 @@ class Node:
     def recv(self):
         return self.ufd.recvfrom(65536)
 
+    def recv_and_handle(self):
+        (message, address) = self.recv()
+        self.protocol.handle_request(message, address)
+
     def serve(self):
         while True:
-            (message, address) = self.recv()
-            self.protocol.handle_request(message, address)
+            self.recv_and_handle()
 
 
 if __name__ == "__main__":
