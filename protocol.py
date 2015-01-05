@@ -10,6 +10,7 @@ class Protocol:
 
     def __init__(self, node):
         self.node = node
+        self.q = ['find_node', 'ping']
 
     def handle_request(self, request, address):
         request = decode(request)
@@ -18,8 +19,11 @@ class Protocol:
         if not self.prehandle(request, address):
             return
 
-        if request['y'] == 'q' and request['q'] in ['find_node', 'ping']:
+        if request['y'] == 'q' and request['q'] in self.q:
             getattr(self, 'handle_' + request['q'])(request, address)
+
+        if request['y'] == 'r' and request['q'] in self.q:
+            getattr(self, 'handle_' + request['q'] + '_response')(request, address)
 
     def prehandle(self, request, address):
         hid = request['a']['id']    # his id
@@ -40,6 +44,9 @@ class Protocol:
             a=dict(id=self.node.address.nid, nodes=self.node.table.get(hid)))
         self.send(msg, address)
 
+    def handle_find_node_response(self, request, address):
+        pass
+
     def send_find_node(self, address, nid):
         msg = dict(
             y="q",
@@ -53,6 +60,9 @@ class Protocol:
             q="ping",
             a=dict(id=self.node.address.nid))
         self.send(msg, address)
+
+    def handle_ping_response(self, request, address):
+        pass
 
     def send_ping(self, address):
         msg = dict(
