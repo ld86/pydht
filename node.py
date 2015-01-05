@@ -6,6 +6,7 @@ from table import Table, NodePinger, NodeAddress
 from random import randint
 from utils import random_id
 from protocol import Protocol
+from logger import log
 
 
 class Node:
@@ -25,8 +26,8 @@ class Node:
     def send(self, message, address):
         try:
             self.ufd.sendto(message, address)
-        except Exception:
-            pass
+        except Exception as e:
+            log("%s %s", address, e)
 
     def recv(self):
         return self.ufd.recvfrom(65536)
