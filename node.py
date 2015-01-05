@@ -23,8 +23,6 @@ class Node:
         self.pinger = NodePinger(self)
         self.protocol = Protocol(self)
 
-        self.pinger.start()
-
     def send(self, message, address):
         try:
             self.ufd.sendto(message, address)

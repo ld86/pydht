@@ -25,6 +25,7 @@ class NodePinger(Thread):
         super(NodePinger, self).__init__()
         self.daemon = True
         self.node = node
+        self.start()
 
     def run(self):
         while sleep(5) is None:
