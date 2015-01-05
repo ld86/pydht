@@ -39,7 +39,8 @@ class Table:
         self.nodes = set()
 
     def update(self, node):
-        self.nodes.add(node)
+        if node.nid != self.node.nid:
+            self.nodes.add(node)
 
     def get(self, nid, k=None):
         return map(lambda node: (node.nid, node.ip, node.port), list(self.nodes))
