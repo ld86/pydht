@@ -32,7 +32,7 @@ class Protocol:
             return False
 
         ip, port = address
-        node = NodeAddress(ip, port, hid)
+        node = NodeAddress(hid, ip, port)
         self.node.table.update(node)
         return True
 

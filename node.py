@@ -14,7 +14,7 @@ class Node:
     def __init__(self, ip=None, port=None, nid=None):
         ip, port = address = (ip if ip is not None else "0.0.0.0", port if port is not None else randint(40000, 50000))
         nid = nid if nid is not None else random_id()
-        self.address = NodeAddress(ip, port, nid)
+        self.address = NodeAddress(nid, ip, port)
 
         self.ufd = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.ufd.bind(address)

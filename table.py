@@ -4,10 +4,10 @@ from time import sleep
 
 class NodeAddress:
 
-    def __init__(self, ip, port, nid):
+    def __init__(self, nid, ip, port):
+        self.nid = nid
         self.ip = ip
         self.port = port
-        self.nid = nid
 
     def __hash__(self):
         return self.nid.__hash__()
