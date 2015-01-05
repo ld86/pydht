@@ -1,6 +1,3 @@
-import sys
-sys.path.append('contrib')
-
 import socket
 from table import Table, NodePinger, NodeAddress
 from random import randint

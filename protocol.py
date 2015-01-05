@@ -1,4 +1,4 @@
-from bencode import bencode, bdecode
+from contrib.bencode import bencode, bdecode
 from logger import log
 from table import NodeAddress
 
