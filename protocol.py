@@ -29,14 +29,15 @@ class Protocol:
 
         ip, port = address
         node = NodeAddress(ip, port, hid)
-        self.node.update(node)
+        self.node.table.update(node)
+        return True
 
     def handle_find_node(self, request, address):
         hid = request['a']['id']    # his id
         msg = dict(
             y='r',
             q='find_node',
-            a=dict(nodes=self.node.table.get(hid)))
+            a=dict(id=self.node.address.nid, nodes=self.node.table.get(hid)))
         self.send(msg, address)
 
     def send_find_node(self, address, nid):
