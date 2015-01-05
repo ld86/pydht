@@ -45,7 +45,8 @@ class Protocol:
         self.send(msg, address)
 
     def handle_find_node_response(self, request, address):
-        pass
+        for node in request['a']['nodes']:
+            self.node.table.update(NodeAddress(node[0], node[1], node[2]))
 
     def send_find_node(self, address, nid):
         msg = dict(
