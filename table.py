@@ -1,18 +1,17 @@
 class NodePinger:
 
-    def __init__(self, table):
+    def __init__(self, socket, table):
         pass
 
 
 class Table:
 
     def __init__(self, node):
-        self.nid = node.nid
+        self.node = node
         self.nodes = set()
-        self.add(self.nid)
 
-    def add(self, nid):
-        self.nodes.add(nid)
+    def add(self, node):
+        self.nodes.add(node)
 
     def get(self, nid, k=None):
         return list(self.nodes)
