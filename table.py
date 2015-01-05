@@ -5,6 +5,15 @@ class NodeAddress:
         self.port = port
         self.nid = nid
 
+    def __hash__(self):
+        return self.nid.__hash__()
+
+    def __eq__(self, other):
+        return self.nid == other.nid
+
+    def __repr__(self):
+        return "{} {} {}".format(self.nid.__hash__(), self.ip, self.port)
+
 
 class NodePinger:
 
@@ -18,8 +27,8 @@ class Table:
         self.node = node
         self.nodes = set()
 
-    def add(self, node):
+    def update(self, node):
         self.nodes.add(node)
 
     def get(self, nid, k=None):
-        return list(self.nodes)
+        return map(lambda node: (node.nid, node.ip, node.port), list(self.nodes))
