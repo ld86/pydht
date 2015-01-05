@@ -1,3 +1,11 @@
+class NodeAddress:
+
+    def __init__(self, ip, port, nid):
+        self.ip = ip
+        self.port = port
+        self.nid = nid
+
+
 class NodePinger:
 
     def __init__(self, socket, table):
