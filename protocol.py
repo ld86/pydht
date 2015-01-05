@@ -1,5 +1,6 @@
 from bencode import bencode, bdecode
 from logger import log
+from table import NodeAddress
 
 encode = bencode
 decode = bdecode
@@ -14,19 +15,24 @@ class Protocol:
         request = decode(request)
 
         log("got request {0}".format(request))
+        if not self.prehandle(request, address):
+            return
 
         if request['y'] == 'q' and request['q'] in ['find_node']:
             getattr(self, 'handle_' + request['q'])(request, address)
 
-    def handle_find_node(self, request, address):
-        mid = self.node.nid         # my id
+    def prehandle(self, request, address):
         hid = request['a']['id']    # his id
+        if hid == self.node.address.nid:
+            log("drop request from myself")
+            return False
 
-        if hid == mid:
-            log("drop find_node request from myself")
-            return
+        ip, port = address
+        node = NodeAddress(ip, port, hid)
+        self.node.update(node)
 
-        self.node.table.add(hid)
+    def handle_find_node(self, request, address):
+        hid = request['a']['id']    # his id
         msg = dict(
             y='r',
             q='find_node',
@@ -37,7 +43,7 @@ class Protocol:
         msg = dict(
             y="q",
             q="find_node",
-            a=dict(id=self.node.nid, target=nid))
+            a=dict(id=self.node.address.nid, target=nid))
         self.send(msg, address)
 
     def send(self, message, address):
@@ -45,4 +51,4 @@ class Protocol:
 
     def bootstrap(self, nodes):
         for address in nodes:
-            self.send_find_node(address, self.node.nid)
+            self.send_find_node(address, self.node.address.nid)
