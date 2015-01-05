@@ -1,3 +1,7 @@
+from threading import Thread
+from time import sleep
+
+
 class NodeAddress:
 
     def __init__(self, ip, port, nid):
@@ -15,10 +19,17 @@ class NodeAddress:
         return "{} {} {}".format(self.nid.__hash__(), self.ip, self.port)
 
 
-class NodePinger:
+class NodePinger(Thread):
 
-    def __init__(self, socket, table):
-        pass
+    def __init__(self, node):
+        super(NodePinger, self).__init__()
+        self.daemon = True
+        self.node = node
+
+    def run(self):
+        while sleep(5) is None:
+            for node in self.node.table.nodes:
+                self.node.protocol.send_ping((node.ip, node.port))
 
 
 class Table:

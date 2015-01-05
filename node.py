@@ -20,8 +20,10 @@ class Node:
         self.ufd.bind(address)
 
         self.table = Table(self.address)
-        self.pinger = NodePinger(self.ufd, self.table)
+        self.pinger = NodePinger(self)
         self.protocol = Protocol(self)
+
+        self.pinger.start()
 
     def send(self, message, address):
         try:

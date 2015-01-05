@@ -18,7 +18,7 @@ class Protocol:
         if not self.prehandle(request, address):
             return
 
-        if request['y'] == 'q' and request['q'] in ['find_node']:
+        if request['y'] == 'q' and request['q'] in ['find_node', 'ping']:
             getattr(self, 'handle_' + request['q'])(request, address)
 
     def prehandle(self, request, address):
@@ -45,6 +45,20 @@ class Protocol:
             y="q",
             q="find_node",
             a=dict(id=self.node.address.nid, target=nid))
+        self.send(msg, address)
+
+    def handle_ping(self, request, address):
+        msg = dict(
+            y="r",
+            q="ping",
+            a=dict(id=self.node.address.nid))
+        self.send(msg, address)
+
+    def send_ping(self, address):
+        msg = dict(
+            y="q",
+            q="ping",
+            a=dict(id=self.node.address.nid))
         self.send(msg, address)
 
     def send(self, message, address):
