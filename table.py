@@ -1,4 +1,4 @@
-from threading import Thread
+from threading import Thread, Lock
 from time import sleep, time, ctime
 from math import log
 from collections import deque
@@ -38,15 +38,24 @@ class NodePinger(Thread):
     def run(self):
         while sleep(30) is None:
             for bucket in self.node.table.buckets:
-                for node in bucket:
+                bucket.lock.acquire()
+                for node in bucket[:1]:
                     self.node.protocol.send_ping((node.ip, node.port))
+                bucket.lock.release()
+
+
+class Deque(deque):
+
+    def __init__(self):
+        super(Deque, self).__init__()
+        self.lock = Lock()
 
 
 class Table:
 
     def __init__(self, node):
         self.node = node
-        self.buckets = [deque() for i in range(160)]
+        self.buckets = [Deque() for i in range(160)]
 
     def distance(self, nid):
         a = int(self.node.nid.encode('hex'), 16)
@@ -59,11 +68,13 @@ class Table:
     def update(self, node):
         if node.nid != self.node.nid:
             bucket = self.buckets[self.bucket(node.nid)]
+            bucket.lock.acquire()
             try:
                 bucket.remove(node)
             except ValueError:
                 pass
             bucket.append(node)
+            bucket.lock.release()
 
     def zigzag(self, b):
         n = len(self.buckets)
