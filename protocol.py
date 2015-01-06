@@ -51,6 +51,7 @@ class Protocol:
 
         new_tail = tail[:]
         new_tail.extend([node[0] for node in nodes])
+        new_tail.append(self.node.address.nid)
 
         for node in nodes:
             if node[0] not in tail:
