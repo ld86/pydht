@@ -10,14 +10,21 @@
         <br/>
         PEERS
         <br/>
-        <table border="1">
-        {% for n in node.table.nodes %}
-            <tr>
-                <td> {{ n.nid.encode('hex') }} </td>
-                <td> {{ n.ip }} </td>
-                <td> {{ n.port }} </td>
-            </tr>
+        {% for bucket in node.table.buckets  %}
+            {% if bucket %}
+            <br/>
+            BUCKET# {{ loop.index }}
+            <table border="1">
+                {% for n in bucket  %}
+                <tr>
+                    <td> {{ n.cts }} </td>
+                    <td> {{ n.nid.encode('hex') }} </td>
+                    <td> {{ n.ip }} </td>
+                    <td> {{ n.port }} </td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
         {% endfor %}
-        </table>
     <body/>
 </html>
