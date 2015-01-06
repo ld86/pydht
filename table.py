@@ -32,17 +32,29 @@ class NodePinger(Thread):
     def __init__(self, node):
         super(NodePinger, self).__init__()
         self.daemon = True
+        self.period = 1
         self.node = node
         self.start()
 
+    def ping_bucket(self, bucket):
+        while True:
+            if bucket:
+                node = bucket[0]
+                if time() - node.ts > 3 * self.period:
+                    bucket.remove(node)
+                    continue
+                self.node.protocol.send_ping((node.ip, node.port))
+            break
+
+    def ping(self):
+        for bucket in self.node.table.buckets:
+            bucket.lock.acquire()
+            self.ping_bucket(bucket)
+            bucket.lock.release()
+
     def run(self):
-        while sleep(30) is None:
-            for bucket in self.node.table.buckets:
-                bucket.lock.acquire()
-                if bucket:
-                    node = bucket[0]
-                    self.node.protocol.send_ping((node.ip, node.port))
-                bucket.lock.release()
+        while sleep(self.period) is None:
+            self.ping()
 
 
 class Deque(deque):
