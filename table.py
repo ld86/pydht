@@ -2,6 +2,7 @@ from threading import Thread
 from time import sleep, time, ctime
 from math import log
 from collections import deque
+import heapq
 
 
 class NodeAddress:
@@ -47,10 +48,13 @@ class Table:
         self.node = node
         self.buckets = [deque() for i in range(160)]
 
-    def bucket(self, nid):
+    def distance(self, nid):
         a = int(self.node.nid.encode('hex'), 16)
         b = int(nid.encode('hex'), 16)
-        return int(log(a ^ b, 2))
+        return a ^ b
+
+    def bucket(self, nid):
+        return int(log(self.distance(nid), 2))
 
     def update(self, node):
         if node.nid != self.node.nid:
@@ -61,11 +65,23 @@ class Table:
                 pass
             bucket.append(node)
 
+    def zigzag(self, b):
+        n = len(self.buckets)
+
+        yield b
+        for i in range(1, n):
+            if b - i >= 0:
+                yield b - i
+            if b + i < n:
+                yield b + n
+
     def get(self, nid, k=20):
         nodes = []
-        for bucket in self.buckets:
-            nodes.extend(bucket)
+        for b in self.zigzag(self.bucket(nid)):
             if len(nodes) > k:
                 break
-        nodes = nodes[:k]
+            for node in self.buckets[b]:
+                heapq.heappush(nodes, (self.distance(node.nid), node))
+
+        nodes = map(lambda distance, node: node, heapq.nsmallest(nodes))
         return map(lambda node: node.address(), list(nodes))
