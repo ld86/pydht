@@ -46,7 +46,7 @@ class Protocol:
             y='r',
             q='find_node',
             a=dict(id=self.node.address.nid, nodes=nodes))
-        self.send(msg, tuple(origin[1:]))
+        self.send(msg, origin)
 
         new_tail = tail[:]
         new_tail.extend([node[0] for node in nodes])
@@ -59,8 +59,9 @@ class Protocol:
         for node in request['a']['nodes']:
             self.node.table.update(NodeAddress(node[0], node[1], node[2]))
 
-    def send_find_node(self, address, nid, origin=None, tail=[]):
+    def send_find_node(self, address, nid, origin=None, tail=None):
         origin = False if origin is None else origin
+        tail = [self.node.address.nid] if tail is None else tail
         msg = dict(
             y="q",
             q="find_node",
