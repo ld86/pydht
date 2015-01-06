@@ -37,22 +37,37 @@ class Protocol:
         return True
 
     def handle_find_node(self, request, address):
-        hid = request['a']['id']    # his id
+        target = request['a']['target']
+        tail = request['a']['tail']
+        origin = request['a']['origin']
+
+        nodes = self.node.table.get(target)
         msg = dict(
             y='r',
             q='find_node',
-            a=dict(id=self.node.address.nid, nodes=self.node.table.get(hid)))
-        self.send(msg, address)
+            a=dict(id=self.node.address.nid, nodes=nodes))
+        self.send(msg, tuple(origin[1:2]))
+
+        new_tail = tail[:]
+        new_tail.extend([node[0] for node in nodes])
+
+        for node in nodes:
+            if node[0] not in tail:
+                self.send_find_node(tuple(node[1:2]), target, origin, new_tail)
 
     def handle_find_node_response(self, request, address):
         for node in request['a']['nodes']:
             self.node.table.update(NodeAddress(node[0], node[1], node[2]))
 
-    def send_find_node(self, address, nid):
+    def send_find_node(self, address, nid, origin=None, tail=[]):
+        origin = self.node.address.address() if origin is None else origin
         msg = dict(
             y="q",
             q="find_node",
-            a=dict(id=self.node.address.nid, target=nid))
+            a=dict(id=self.node.address.nid,
+                   target=nid,
+                   origin=origin,  # origin address
+                   tail=tail))  # tail, who send me something
         self.send(msg, address)
 
     def handle_ping(self, request, address):
