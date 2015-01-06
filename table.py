@@ -73,7 +73,7 @@ class Table:
             if b - i >= 0:
                 yield b - i
             if b + i < n:
-                yield b + n
+                yield b + i
 
     def get(self, nid, k=20):
         nodes = []
@@ -83,5 +83,5 @@ class Table:
             for node in self.buckets[b]:
                 heapq.heappush(nodes, (self.distance(node.nid), node))
 
-        nodes = map(lambda distance, node: node, heapq.nsmallest(nodes))
+        nodes = map(lambda distance_and_node: distance_and_node[1], heapq.nsmallest(k, nodes))
         return map(lambda node: node.address(), list(nodes))
