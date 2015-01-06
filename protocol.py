@@ -39,7 +39,8 @@ class Protocol:
     def handle_find_node(self, request, address):
         target = request['a']['target']
         tail = request['a']['tail']
-        origin = address if not request['a']['origin'] else request['a']['origin']
+        origin = request['a']['origin']
+        origin = address if not origin else tuple(origin)
 
         nodes = self.node.table.get(target)
         msg = dict(
