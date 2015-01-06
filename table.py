@@ -32,19 +32,21 @@ class NodePinger(Thread):
     def __init__(self, node):
         super(NodePinger, self).__init__()
         self.daemon = True
-        self.period = 1
+        self.period = 30
         self.node = node
         self.start()
 
     def ping_bucket(self, bucket):
-        while True:
-            if bucket:
-                node = bucket[0]
-                if time() - node.ts > 3 * self.period:
-                    bucket.remove(node)
-                    continue
-                self.node.protocol.send_ping((node.ip, node.port))
-            break
+        for_remove = []
+
+        for node in bucket:
+            if time() - node.ts > 3 * self.period:
+                for_remove.append(node)
+                continue
+            self.node.protocol.send_ping((node.ip, node.port))
+
+        for node in for_remove:
+            bucket.remove(node)
 
     def ping(self):
         for bucket in self.node.table.buckets:
