@@ -39,7 +39,8 @@ class NodePinger(Thread):
         while sleep(30) is None:
             for bucket in self.node.table.buckets:
                 bucket.lock.acquire()
-                for node in bucket[:1]:
+                if bucket:
+                    node = bucket[0]
                     self.node.protocol.send_ping((node.ip, node.port))
                 bucket.lock.release()
 
@@ -86,7 +87,7 @@ class Table:
             if b + i < n:
                 yield b + i
 
-    def get(self, nid, k=20):
+    def get(self, nid, k=5):
         nodes = []
         for b in self.zigzag(self.bucket(nid)):
             if len(nodes) > k:
