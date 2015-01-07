@@ -60,7 +60,7 @@ class NodePinger(Thread):
             bucket.lock.release()
 
         if not any_alive:
-            self.node.protocol.boostrap()
+            self.node.protocol.bootstrap()
 
     def run(self):
         while sleep(self.period) is None:
