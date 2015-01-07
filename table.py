@@ -56,7 +56,8 @@ class NodePinger(Thread):
         any_alive = False
         for bucket in self.node.table.buckets:
             bucket.lock.acquire()
-            any_alive = any_alive or self.ping_bucket(bucket)
+            any_alive_in_bucket = self.ping_bucket(bucket)
+            any_alive = any_alive or any_alive_in_bucket
             bucket.lock.release()
 
         if not any_alive:
