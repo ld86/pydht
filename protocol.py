@@ -50,7 +50,7 @@ class Protocol:
         self.send(msg, origin)
 
         new_tail = tail[:]
-        new_tail.extend([node[0] for node in nodes])
+        new_tail.extend([node[0] for node in nodes])  # make set instead of list
         new_tail.append(self.node.address.nid)
 
         for node in nodes:
