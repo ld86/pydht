@@ -50,14 +50,17 @@ class NodePinger(Thread):
         for node in for_remove:
             bucket.remove(node)
 
-        if not any_alive:
-            self.node.protocol.bootstrap()
+        return any_alive
 
     def ping(self):
+        any_alive = False
         for bucket in self.node.table.buckets:
             bucket.lock.acquire()
-            self.ping_bucket(bucket)
+            any_alive = any_alive or self.ping_bucket(bucket)
             bucket.lock.release()
+
+        if not any_alive:
+            self.node.protocol.boostrap()
 
     def run(self):
         while sleep(self.period) is None:
