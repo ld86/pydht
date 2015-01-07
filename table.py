@@ -38,15 +38,20 @@ class NodePinger(Thread):
 
     def ping_bucket(self, bucket):
         for_remove = []
+        any_alive = False
 
         for node in bucket:
             if time() - node.ts > 3 * self.period:
                 for_remove.append(node)
                 continue
+            any_alive = True
             self.node.protocol.send_ping((node.ip, node.port))
 
         for node in for_remove:
             bucket.remove(node)
+
+        if not any_alive:
+            self.node.protocol.bootstrap()
 
     def ping(self):
         for bucket in self.node.table.buckets:

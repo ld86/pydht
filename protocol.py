@@ -93,6 +93,6 @@ class Protocol:
     def send(self, message, address):
         self.node.send(encode(message), address)
 
-    def bootstrap(self, nodes):
-        for address in nodes:
+    def bootstrap(self):
+        for address in self.node.bootstrap_nodes:
             self.send_find_node(address, self.node.address.nid)
