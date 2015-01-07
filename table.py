@@ -88,7 +88,8 @@ class Table:
                 bucket.remove(node)
             except ValueError:
                 pass
-            bucket.append(node)
+            if len(bucket) < 5:
+                bucket.append(node)
             bucket.lock.release()
 
     def zigzag(self, b):
