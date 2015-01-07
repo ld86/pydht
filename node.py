@@ -12,7 +12,9 @@ class Node(Thread):
     def __init__(self, ip=None, port=None, nid=None):
         super(Node, self).__init__()
         self.daemon = True
-        self.bootstrap_nodes = [("ts", 6881), ("192.168.1.100", 6881)]
+        self.bootstrap_nodes = [("ts", 6881),
+                                ("192.168.1.100", 6881),
+                                ("ld86.org", 6881)]
 
         ip, port = address = (ip if ip is not None else "0.0.0.0",
                               port if port is not None else randint(40000, 50000))
