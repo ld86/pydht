@@ -6,7 +6,11 @@ def entropy(length):
     return ''.join(chr(randint(0, 255)) for _ in xrange(length))
 
 
-def random_id():
+def sha(message):
     hash = sha1()
-    hash.update(entropy(40))
+    hash.update(message)
     return hash.digest()
+
+
+def random_id():
+    return sha(entropy(40))
