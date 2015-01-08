@@ -28,6 +28,7 @@ class Node(Thread):
         self.table = Table(self.address)
         self.pinger = NodePinger(self)
         self.protocol = Protocol(self)
+        self.storage = {}
 
     def send(self, message, address):
         try:

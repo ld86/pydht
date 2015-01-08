@@ -1,6 +1,7 @@
 from contrib.bencode import bencode, bdecode
 from logger import log
 from table import NodeAddress
+from utils import sha
 
 encode = bencode
 decode = bdecode
@@ -35,6 +36,50 @@ class Protocol:
         node = NodeAddress(hid, ip, port)
         self.node.table.update(node)
         return True
+
+    def handle_store(self, request, address):
+        key = request['a']['key']
+        value = request['a']['value']
+        self.node.storage[key] = value
+
+        tail = request['a']['tail']
+        origin = request['a']['origin']
+        origin = address if not origin else tuple(origin)
+
+        msg = dict(
+            y='r',
+            q='store',
+            a=dict(id=self.node.address.nid,
+                   key=key,
+                   value=value))
+        self.send(msg, origin)
+        self.send_store(key, value, origin, tail)
+
+    def send_store(self, key, value, origin=None, tail=None):
+        key = sha(key)
+        nodes = self.node.table.get(key)
+
+        origin = False if origin is None else origin
+        tail = [self.node.address.nid] if tail is None else tail
+
+        new_tail = tail[:]
+        new_tail.extend([node[0] for node in nodes])  # make set instead of list
+        new_tail.append(self.node.address.nid)
+
+        for node in nodes:
+            if node[0] not in tail:
+                msg = dict(
+                    y="q",
+                    q="store",
+                    a=dict(id=self.node.address.nid,
+                           key=key,
+                           value=value,
+                           origin=origin,  # origin address
+                           tail=new_tail))  # tail, who send me something
+                self.send(msg, tuple(node[1:]))
+
+    def handle_store_response(self, request, address):
+        pass
 
     def handle_find_node(self, request, address):
         target = request['a']['target']
